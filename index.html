@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Excel Academy - Console Officielle 2026</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue: #0478ba;
+            --orange: #ed8c0b;
+            --glass: rgba(255, 255, 255, 0.97);
+            --dark-bg: #020a12;
+            --red: #d90429;
+            --glow: radial-gradient(circle, rgba(4,120,186,0.4) 0%, rgba(237,140,11,0.2) 50%, rgba(0,0,0,0) 70%);
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+
+        @keyframes fullScreenIntro {
+            0% { top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.6); opacity: 0; filter: blur(20px); width: 95%; font-size: 50px; }
+            30% { opacity: 1; filter: blur(0px); transform: translate(-50%, -50%) scale(1); }
+            70% { top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 50px; width: 95%; }
+            100% { top: 30px; left: 50%; transform: translate(-50%, 0); font-size: 22px; width: 80%; }
+        }
+
+        @keyframes letterBounce { 0% { transform: translateY(15px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        @keyframes orangeFlash { 0%, 100% { color: var(--blue); } 20%, 50% { color: var(--orange); } }
+
+        .bounce-letter { display: inline-block; animation: letterBounce 0.3s ease forwards, orangeFlash 0.7s ease forwards; white-space: pre; }
+
+        body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; overflow: hidden; font-family: 'Outfit', sans-serif; background: var(--dark-bg); }
+        #particles-js { position: absolute; width: 100%; height: 100%; background: radial-gradient(circle at center, #0a2a43 0%, #020a12 100%); z-index: 1; }
+
+        .static-top-text {
+            position: absolute; color: white; font-weight: 900; text-transform: uppercase; z-index: 999;
+            text-align: center; line-height: 1.2; padding: 0 50px; box-sizing: border-box;
+            animation: fullScreenIntro 3.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        }
+        .static-top-text::after { content: ''; display: block; width: 150px; height: 4px; background: var(--orange); margin: 10px auto; box-shadow: 0 0 15px var(--orange); border-radius: 10px; }
+
+        .logo-wrapper {
+            position: absolute; top: 20px; left: 30px; z-index: 100;
+            display: flex; align-items: center; gap: 30px; padding: 20px;
+            animation: floating 4s ease-in-out infinite;
+        }
+        .logo-glow-bg {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 120%; height: 140%; background: var(--glow); filter: blur(25px); z-index: -1; border-radius: 50%;
+        }
+        .logo-img { height: 80px; width: auto; object-fit: contain; filter: drop-shadow(0 0 15px rgba(255,255,255,0.3)); transition: transform 0.3s ease; }
+        .logo-img:hover { transform: scale(1.1); }
+
+        .main-wrapper { position: relative; z-index: 10; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        .clock-panel { position: absolute; bottom: 40px; right: 50px; text-align: right; color: white; z-index: 100; }
+        #time { font-size: 100px; font-weight: 900; line-height: 0.8; letter-spacing: -3px; }
+        #date { font-size: 18px; color: #aaa; text-transform: uppercase; margin-top: 10px; }
+        
+        .glass-card {
+            background: var(--glass); backdrop-filter: blur(30px); border-radius: 50px;
+            width: 85%; max-width: 1100px; min-height: 480px; padding: 40px; text-align: center;
+            border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; animation: fadeIn 0.5s ease 3.2s forwards;
+            transition: opacity 0.5s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .icon-container { font-size: 75px; margin-bottom: 20px; color: var(--blue); }
+        .title-main { font-size: 55px; font-weight: 900; color: var(--blue); margin: 0; line-height: 1.1; }
+        .subtitle-main { font-size: 32px; color: var(--orange); font-weight: 700; margin-top: 15px; }
+
+        .end-time-badge { margin-top: 30px; background: #fff; padding: 15px 40px; border-radius: 100px; border: 3px solid var(--orange); font-size: 26px; font-weight: 900; color: var(--dark-bg); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+
+        .regle-item { background: #f8f9fa; padding: 25px; border-radius: 25px; font-size: 22px; font-weight: 800; border-left: 12px solid var(--red); color: #222; text-align: left; }
+
+        /* --- ADMIN --- */
+        #admin { position: fixed; top: 20px; right: 20px; background: white; padding: 25px; border-radius: 25px; z-index: 1000; width: 340px; color: #333; display: none; border: 2px solid var(--blue); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        #admin textarea, #admin select, #admin input, #pass-input { width: 100%; background: #f0f4f8; border: 2px solid #ddd; color: #000 !important; padding: 10px; border-radius: 10px; font-family: 'Outfit'; margin-bottom: 8px; font-weight: 600; box-sizing: border-box; }
+        .nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 10px; }
+        .page-btn { padding: 8px; background: #eee; border: none; color: #555; border-radius: 8px; font-size: 9px; font-weight: 800; cursor: pointer; }
+        .page-btn.active { background: var(--blue); color: white; }
+        .btn-adm { width: 100%; padding: 12px; margin-top: 5px; border-radius: 10px; border: none; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+
+        .loop-section { background: #f9f9f9; padding: 12px; border-radius: 15px; margin-bottom: 10px; border: 1px dashed var(--blue); }
+        .flex-group { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+        #login-overlay { position: fixed; inset: 0; background: rgba(2,10,18,0.95); z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .login-card { background: white; padding: 40px; border-radius: 40px; text-align: center; width: 350px; border: 4px solid var(--blue); }
+    </style>
+</head>
+<body>
+
+    <div id="particles-js"></div>
+    <div id="top-phrase" class="static-top-text">AXE ACCOMPAGNEMENT PERSONNALISÉ</div>
+
+    <div class="logo-wrapper">
+        <div class="logo-glow-bg"></div>
+        <img src="https://excelacademy.ma/wp-content/uploads/2021/08/237-75.png" class="logo-img" alt="Excel Academy">
+        <img src="logo-perso.png" class="logo-img" alt="Logo Personnel" onerror="this.src='https://i.postimg.cc/mrp8pCc3/liped.png'">
+    </div>
+
+    <div id="login-overlay">
+        <div class="login-card">
+            <h2 style="color:var(--blue); font-weight: 900; margin-bottom: 20px;">ADMIN ACCESS</h2>
+            <input type="password" id="pass-input" placeholder="ENTREZ LE CODE">
+            <button onclick="checkPass()" class="btn-adm" style="background: var(--blue); color: white;">VALIDER</button>
+        </div>
+    </div>
+
+    <div class="main-wrapper">
+        <div id="main-card" class="glass-card"></div>
+        <div class="clock-panel">
+            <div id="time">00:00</div>
+            <div id="date">-- --- ----</div>
+        </div>
+    </div>
+
+    <div id="admin">
+        <h3 style="color:var(--blue); font-weight:900; margin:0 0 10px 0;">DASHBOARD ADMIN</h3>
+        <label style="font-size: 10px; font-weight: 800; color: var(--orange);">PLANNING</label>
+        <textarea id="prog-input" oninput="render()" style="height: 60px;">08h30 : Mathématiques&#10;11h00 : Langue Arabe</textarea>
+        
+        <label style="font-size: 10px; font-weight: 800; color: var(--orange);">MATIÈRE</label>
+        <select id="matiere-select" onchange="render()">
+            <option value="MATHÉMATIQUES|fa-square-root-variable">Mathématiques</option>
+            <option value="PHYSIQUE-CHIMIE|fa-flask-vial">Physique-Chimie</option>
+            <option value="SCIENCES DE LA VIE ET DE LA TERRE|fa-dna">SVT</option>
+            <option value="INFORMATIQUE|fa-laptop-code">Informatique</option>
+            <option value="ARABE|fa-scroll">Arabe</option>
+            <option value="FRANÇAIS|fa-pen-nib">Français</option>
+            <option value="ANGLAIS|fa-language">Anglais</option>
+            <option value="HISTOIRE-GÉO|fa-earth-africa">Histoire-Géo</option>
+            <option value="ÉD. ISLAMIQUE|fa-mosque">Éd. Islamique</option>
+            <option value="TECHNOLOGIE|fa-gears">Technologie</option>
+            <option value="ÉD. PHYSIQUE|fa-running">Éducation Physique</option>
+            <option value="ARTS PLASTIQUES|fa-palette">Arts Plastiques</option>
+            <option value="MUSIQUE|fa-music">Éducation Musicale</option>
+        </select>
+        
+        <label style="font-size: 10px; font-weight: 800; color: var(--orange);">DURÉE</label>
+        <input type="text" id="duree-input" value="1H30">
+
+        <div class="loop-section">
+            <label style="font-size: 10px; font-weight: 800; color: var(--blue);">LECTURE AUTO (LOOP)</label>
+            <div class="flex-group">
+                <input type="checkbox" id="loop-toggle" onchange="manageLoop()" style="width:20px; height:20px; cursor:pointer;">
+                <input type="range" id="loop-speed" min="3" max="30" value="7" oninput="updateSpeedLabel(this.value)" style="flex:1;">
+                <span id="speed-display" style="font-weight:900; color:var(--orange); font-size:14px;">7s</span>
+            </div>
+        </div>
+        
+        <div class="nav-grid">
+            <button class="page-btn active" onclick="goToPage(0)">TITRE</button>
+            <button class="page-btn" onclick="goToPage(1)">PROG</button>
+            <button class="page-btn" onclick="goToPage(2)">MATIÈRE</button>
+            <button class="page-btn" onclick="goToPage(3)">RÈGLES</button>
+            <button class="page-btn" onclick="goToPage(4)">SILENCE</button>
+            <button class="page-btn" onclick="goToPage(5)">CHANCE</button>
+            <button class="page-btn" onclick="goToPage(6)" style="color:var(--red)">FIN</button>
+        </div>
+        
+        <button class="btn-adm" style="background:#2a9d8f; color:white;" onclick="startOfficialExam()">LANCER L'ÉPREUVE</button>
+        <button class="btn-adm" style="background:var(--red); color:white;" onclick="stopExamForce()">STOP</button>
+        <button class="btn-adm" style="background:#333; color:white;" onclick="hideAdmin()">FERMER (ESC)</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        const PASS = "excelacademy2026";
+        let currentStep = 0;
+        let finalTimeStr = null;
+        let loopTimer = null;
+        let isFirstLoad = true;
+
+        particlesJS("particles-js", { "particles": { "number": { "value": 30 }, "opacity": { "value": 0.2 }, "move": { "speed": 0.6 } } });
+
+        function updateClock() {
+            const now = new Date();
+            const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('time').textContent = currentTime;
+            document.getElementById('date').textContent = now.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'}).toUpperCase();
+            if (finalTimeStr && currentTime === finalTimeStr && currentStep !== 6) { goToPage(6); finalTimeStr = null; }
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        function updateSpeedLabel(val) {
+            document.getElementById('speed-display').textContent = val + "s";
+            if(document.getElementById('loop-toggle').checked) manageLoop();
+        }
+
+        function manageLoop() {
+            clearInterval(loopTimer);
+            if(document.getElementById('loop-toggle').checked) {
+                const speed = document.getElementById('loop-speed').value * 1000;
+                loopTimer = setInterval(() => {
+                    currentStep = (currentStep + 1) % 6;
+                    render();
+                }, speed);
+            }
+        }
+
+        function wrapLetters(text, isLong = false) {
+            const speed = isLong ? 0.012 : 0.025;
+            const startDelay = isFirstLoad ? 3.3 : 0.1; 
+            return text.split('').map((char, i) => {
+                const delay = startDelay + (i * speed);
+                return `<span class="bounce-letter" style="animation-delay: ${delay}s, ${delay}s">${char}</span>`;
+            }).join('');
+        }
+
+        function calculateEndTime() {
+            const duration = document.getElementById('duree-input').value.toUpperCase();
+            let mins = 0;
+            if (duration.includes('H')) {
+                const p = duration.split('H');
+                mins = (parseInt(p[0]) * 60) + (parseInt(p[1]) || 0);
+            } else { mins = parseInt(duration); }
+            const end = new Date(new Date().getTime() + mins * 60000);
+            return end.getHours().toString().padStart(2, '0') + ":" + end.getMinutes().toString().padStart(2, '0');
+        }
+
+        function render() {
+            const card = document.getElementById('main-card');
+            const mat = document.getElementById('matiere-select').value.split('|');
+            let html = "";
+            
+            if(!isFirstLoad) card.style.opacity = "0";
+
+            setTimeout(() => {
+                switch(currentStep) {
+                    case 0: html = `<div class="icon-container"><i class="fa-solid fa-award"></i></div><h1 class="title-main" style="font-size:48px">${wrapLetters("EXAMEN LOCAL 3ÈME ANNÉE COLLÈGE")}</h1><h2 class="subtitle-main">SESSION JANVIER 2026</h2>`; break;
+                    case 1: 
+                        const progLines = document.getElementById('prog-input').value.split('\n').map(l => `<div style="font-size:24px; font-weight:800; color:var(--blue); margin-bottom:10px;"><i class="fa-solid fa-clock" style="color:var(--orange)"></i> ${wrapLetters(l, true)}</div>`).join('');
+                        html = `<h1 class="title-main" style="font-size:45px; border-bottom:3px solid var(--orange); margin-bottom:25px;">${wrapLetters("PLANNING DU JOUR")}</h1>${progLines}`; break;
+                    case 2: 
+                        html = `<div class="icon-container"><i class="fa-solid ${mat[1]}"></i></div><h1 class="title-main" style="font-size:50px">${wrapLetters(mat[0])}</h1><h2 class="subtitle-main">DURÉE : ${document.getElementById('duree-input').value}</h2>
+                                ${finalTimeStr ? `<div class="end-time-badge"><i class="fa-solid fa-stopwatch"></i> FIN : ${finalTimeStr}</div>` : ''}`; break;
+                    case 3: 
+                        html = `<h1 class="title-main" style="color:var(--red); margin-bottom:10px;">${wrapLetters("CONSIGNES")}</h1>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px; width:95%;">
+                                    <div class="regle-item">📱 MOBILES INTERDITS</div><div class="regle-item">🤐 SILENCE ABSOLU</div>
+                                    <div class="regle-item">🚪 SORTIE INTERDITE</div><div class="regle-item" style="color:var(--red)">🚫 TRICHE = ZÉRO</div>
+                                </div>`; break;
+                    case 4: html = `<div class="icon-container"><i class="fa-solid fa-volume-xmark"></i></div><h1 class="title-main">${wrapLetters("SILENCE")}</h1><h2 class="subtitle-main">CONCENTRATION</h2>`; break;
+                    case 5: html = `<div class="icon-container"><i class="fa-solid fa-graduation-cap"></i></div><h1 class="title-main">${wrapLetters("BONNE CHANCE")}</h1><h2 class="subtitle-main">EXCEL ACADEMY</h2>`; break;
+                    case 6: html = `<h1 class="title-main" style="color:var(--red); font-size:80px">${wrapLetters("TEMPS ÉCOULÉ")}</h1><h2 class="subtitle-main">POSEZ VOS STYLOS</h2>`; break;
+                }
+                card.innerHTML = html;
+                if(!isFirstLoad) card.style.opacity = "1";
+                document.querySelectorAll('.page-btn').forEach((btn, i) => btn.classList.toggle('active', i === currentStep));
+                isFirstLoad = false;
+            }, isFirstLoad ? 0 : 300);
+        }
+
+        function checkPass() { if(document.getElementById('pass-input').value === PASS) { document.getElementById('login-overlay').style.display='none'; document.getElementById('admin').style.display='block'; } else { alert("Code Incorrect"); } }
+        function startOfficialExam() { finalTimeStr = calculateEndTime(); hideAdmin(); goToPage(2); }
+        function stopExamForce() { finalTimeStr = null; goToPage(0); }
+        function goToPage(i) { currentStep = i; render(); }
+        function hideAdmin() { document.getElementById('admin').style.display = 'none'; }
+        
+        window.addEventListener('keydown', (e) => { 
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return; 
+            if(e.key.toLowerCase() === 'a') { document.getElementById('login-overlay').style.display = 'flex'; document.getElementById('pass-input').focus(); }
+            if(e.key === "Escape") hideAdmin(); 
+        });
+        render();
+    </script>
+</body>
+</html>
